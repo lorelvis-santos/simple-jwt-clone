@@ -42,6 +42,47 @@ std::string base64_encode(const std::string& input) {
     }
 
     // To do: fill remaining bits with = (this happens when there's bytes remaining from the input)
+    std::size_t remaining = len - i;
+
+    // Hay que recordar que base64 siempre produce 4 caracteres en base64
+
+    // Caso 1
+    // Nos queda 1 byte -> 8 bits
+    // Podemos hacer 2 caracteres base64
+    // Primeros 6 bits del byte
+    // Ultimos 2 bits del byte + relleno de 4 bits con 0
+    // Padding de caracteres con = 
+
+    // Caso 2
+    // Nos quedan 2 bytes -> 16 bits
+    // Podemos hacer 3 caracteres
+    // Primeros 6 bits del byte1
+    // Ultimos 2 bits del byte1 + primeros 4 bits del byte2
+    // Ultimos 4 bits del byte2 + relleno de 2 bits con 0
+
+    if (remaining == 1) {
+        unsigned char byte0 = static_cast<unsigned char>(input[i]);
+
+        unsigned int index0 = (byte0 & 0b11111100) >> 2;
+        unsigned int index1 = (byte0 & 0b00000011) << 4;
+
+        out.push_back(BASE64_ALPHABET[index0]);
+        out.push_back(BASE64_ALPHABET[index1]);
+        out.push_back('=');
+        out.push_back('=');
+    } else if (remaining == 2) {
+        unsigned char byte0 = static_cast<unsigned char>(input[i]);
+        unsigned char byte1 = static_cast<unsigned char>(input[i+1]);
+
+        unsigned int index0 = (byte0 & 0b11111100) >> 2;
+        unsigned int index1 = ((byte0 & 0b00000011) << 4 | (byte1 >> 4));
+        unsigned int index2 = (byte1 & 0b00001111) << 2;
+
+        out.push_back(BASE64_ALPHABET[index0]);
+        out.push_back(BASE64_ALPHABET[index1]);
+        out.push_back(BASE64_ALPHABET[index2]);
+        out.push_back('=');
+    }
 
     return out;
 }

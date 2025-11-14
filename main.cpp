@@ -3,6 +3,11 @@
 #include <iostream>
 
 int main() {
-    std::cout << "base64 encoding: " << base64_encode("And") << std::endl;
+    std::string input;
+
+    std::cout << "input: ";
+    std::getline(std::cin, input);
+
+    std::cout << "base64 encoding: " << base64_encode(input) << std::endl;
     return 0;
 }
