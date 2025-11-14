@@ -17,41 +17,31 @@ static const std::string BASE64_ALPHABET =
 
 std::string base64_encode(const std::string& input) {
     std::string out;
+    std::size_t i = 0;
+    std::size_t len = input.size();
 
-    // 128 64  32  16  8   4   2   1
-    // 0   0   0   0   0   0   0   0
+    while (i + 3 <= len) {
+        // We get three bytes from the input
+        unsigned char byte0 = static_cast<unsigned char>(input[i]);
+        unsigned char byte1 = static_cast<unsigned char>(input[i+1]);
+        unsigned char byte2 = static_cast<unsigned char>(input[i+2]);
 
-    // A -> 65  -> 0100 0001
-    // n -> 110 -> 0110 1110
-    // d -> 100 -> 0110 0100
+        i += 3;
 
-    // 32  16  8  |  4   2   1
-    // 0   0   0  |  0   0   0
+        // We convert the three bytes (24 bits) into four sections of 6 bits (4x6 = 24 bits)
+        unsigned int index0 = (byte0 & 0b11111100) >> 2;
+        unsigned int index1 = ((byte0 & 0b00000011) << 4 | (byte1 >> 4));
+        unsigned int index2 = ((byte1 & 0b00001111) << 2 | (byte2 >> 6));
+        unsigned int index3 = ((byte2 & 0b00111111));
 
-    // i1 -> 010 000 -> 16 -> Q
-    // i2 -> 010 110 -> 22 -> W
-    // i3 -> 111 001 -> 57 -> 5
-    // i4 -> 100 100 -> 36 -> k
+        // We use our base64 alphabet to get the letters for each index
+        out.push_back(BASE64_ALPHABET[index0]);
+        out.push_back(BASE64_ALPHABET[index1]);
+        out.push_back(BASE64_ALPHABET[index2]);
+        out.push_back(BASE64_ALPHABET[index3]);
+    }
 
-    std::string str = "And";
-
-    unsigned char byte0 = str[0];
-    unsigned char byte1 = str[1];
-    unsigned char byte2 = str[2];
-
-    unsigned int index0 = (byte0 & 0b11111100) >> 2;
-    // Mask structure, not real values.
-    // ((byte0 & 0b00000011) << 4) -> 00110000
-    // (byte1 >> 4)                -> 00001111
-    // | operand with 2 values     -> 00111111
-    unsigned int index1 = ((byte0 & 0b00000011) << 4 | (byte1 >> 4));
-    unsigned int index2 = ((byte1 & 0b00001111) << 2 | (byte2 >> 6));
-    unsigned int index3 = ((byte2 & 0b00111111));
-
-    out.push_back(BASE64_ALPHABET[index0]);
-    out.push_back(BASE64_ALPHABET[index1]);
-    out.push_back(BASE64_ALPHABET[index2]);
-    out.push_back(BASE64_ALPHABET[index3]);
+    // To do: fill remaining bits with = (this happens when there's bytes remaining from the input)
 
     return out;
 }

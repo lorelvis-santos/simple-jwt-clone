@@ -3,6 +3,6 @@
 #include <iostream>
 
 int main() {
-    std::cout << "base64 encoding: " << base64_encode("") << std::endl;
+    std::cout << "base64 encoding: " << base64_encode("And") << std::endl;
     return 0;
 }
