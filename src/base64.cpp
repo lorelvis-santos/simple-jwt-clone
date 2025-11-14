@@ -1,6 +1,8 @@
 #include "base64.h"
 #include <string>
 #include <vector>
+#include <iostream>
+#include <bitset>
 
 // Tenemos un diccionario de 64 carácteres
 // [A-z][a-z][0-9][+/]
@@ -41,7 +43,7 @@ std::string base64_encode(const std::string& input) {
         out.push_back(BASE64_ALPHABET[index3]);
     }
 
-    // To do: fill remaining bits with = (this happens when there's bytes remaining from the input)
+    // Fill remaining bits with = (this happens when there's bytes remaining from the input)
     std::size_t remaining = len - i;
 
     // Hay que recordar que base64 siempre produce 4 caracteres en base64
@@ -85,4 +87,42 @@ std::string base64_encode(const std::string& input) {
     }
 
     return out;
+}
+
+std::string base64_decode(const std::string& input, bool debug) {
+    std::string text, decoded;
+    int padding = 0;
+
+    for (std::size_t i = 0; i < input.size(); i++) {
+        if (debug) {
+            std::cout << "[" << i << "] -> " << input[i] << " -> " << BASE64_ALPHABET.find(input[i]) << " -> " << std::bitset<6>(BASE64_ALPHABET.find(input[i])) << std::endl;
+        }
+
+        if (input[i] == '=') {
+            padding++;
+            text.append("000000");
+            continue;
+        }
+
+        text.append(std::bitset<6>(BASE64_ALPHABET.find(input[i])).to_string());
+    }
+
+    std::size_t i = 0;
+
+    while (i + 8 <= text.size()) {
+        std::bitset<8> bitset(text.substr(i, 8));
+        unsigned char byte = static_cast<unsigned char>(bitset.to_ullong());
+        decoded.push_back(static_cast<char>(byte));
+
+        i += 8;
+    }
+
+    // Quitar los bytes que corresponden al padding
+    // 1 '='  -> sobra 1 byte
+    // 2 '='  -> sobran 2 bytes
+    if (padding > 0 && padding <= 2 && decoded.size() >= static_cast<std::size_t>(padding)) {
+        decoded.erase(decoded.end() - padding, decoded.end());
+    }
+
+    return decoded;
 }
