@@ -22,3 +22,18 @@ $(TARGET): $(SOURCES)
 # Clean generated files
 clean:
 	rm -f $(TARGET)
+
+# Tests
+TEST_DIR = tests
+TEST_BIN = bin/tests
+
+test: $(TEST_BIN)
+
+$(TEST_BIN): $(TEST_DIR)/*.cpp src/*.cpp
+	mkdir -p bin
+	g++ -std=c++17 -Wall -Wextra -O2 \
+		$(TEST_DIR)/*.cpp src/*.cpp \
+		-o $(TEST_BIN)
+
+clean-tests:
+	rm -f $(TEST_BIN)
