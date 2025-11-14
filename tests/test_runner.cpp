@@ -5,12 +5,22 @@ bool run_base64_encode_tests();
 bool run_base64_decode_tests();
 bool run_base64_roundtrip_tests();
 
+bool run_base64url_encode_tests();
+bool run_base64url_decode_tests();
+bool run_base64url_roundtrip_tests();
+
 int main() {
     int failures = 0;
 
-    if (!run_base64_encode_tests()) failures++;
-    if (!run_base64_decode_tests()) failures++;
-    if (!run_base64_roundtrip_tests()) failures++;
+    // Base64 normal
+    if (!run_base64_encode_tests())      failures++;
+    if (!run_base64_decode_tests())      failures++;
+    if (!run_base64_roundtrip_tests())   failures++;
+
+    // Base64URL
+    if (!run_base64url_encode_tests())      failures++;
+    if (!run_base64url_decode_tests())      failures++;
+    if (!run_base64url_roundtrip_tests())   failures++;
 
     std::cout << "\n== TEST SUMMARY ==\n";
     if (failures == 0) {
