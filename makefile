@@ -10,7 +10,7 @@ BINDIR   := bin
 TARGET   := $(BINDIR)/simple-jwt-clone
 
 # Source files
-SOURCES  := main.cpp $(SRCDIR)/base64.cpp
+SOURCES  := main.cpp $(SRCDIR)/*.cpp
 
 # Default rule
 all: $(TARGET)
